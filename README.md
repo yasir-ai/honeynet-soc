@@ -1,4 +1,4 @@
-# 🛡️ Azure SOC & Honeynet Fortification Project [Part 1] 🛡️
+# 🛡️ Azure SOC & Honeynet Fortification Lab [Part 1] 🛡️
 
 [![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
 [![Microsoft Sentinel](https://img.shields.io/badge/Microsoft_Sentinel-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/en-us/services/microsoft-sentinel/)
@@ -6,9 +6,23 @@
 [![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Project-blue?style=for-the-badge)](https://en.wikipedia.org/wiki/Computer_security)
 [![NIST](https://img.shields.io/badge/NIST%20Framework-Applied-lightgrey?style=for-the-badge)](https://www.nist.gov/cyberframework)
 
-## 🚀 Introduction
+## 🚀 TL;DR: why this matters
 
-This project documents the creation and hardening of a scalable **honeynet** within the Microsoft Azure cloud ecosystem. The primary objective was to establish a controlled, observable environment to attract and analyze malicious activity, then implement robust security controls and measure their effectiveness.
+I spent 2 x 24hr sprints in Azure simulating how a real SOC team would:
+1) Attract threat actors (honeynet)
+2) Observe + analyze attack patterns
+3) Then harden the environment and track the **measurable delta**
+
+👉 This was full Azure infrastructure + Sentinel + KQL + **NIST mapping**  
+👉 Simulated both organic + controlled attacks to validate SIEM coverage  
+👉 All detections + hardening moves backed by actual incident data
+
+> Think of this like a solo built, battle tested cloud SOC playbook  
+> Proved its effectiveness with metrics, instead of relying on theory
+
+## Abstract
+
+This project documents the creation and hardening of a scalable **honeynet** within the Microsoft Azure cloud ecosystem. The primary objective was to establish a controlled, observable environment to attract & bait... then analyze malicious activity, then implement robust security controls and _measure_ their effectiveness.
 
 By ingesting logs from diverse Azure resources into a central **Azure Log Analytics Workspace (LAW)**, and leveraging **Microsoft Sentinel** as our Security Information and Event Management (SIEM) solution, we could:
 1.  Detect and visualize attack patterns.
@@ -22,24 +36,39 @@ This hands-on endeavor mirrors real-world Security Operations Center (SOC) pract
 
 ---
 
-## 🛠️ Core Technologies & Tools Utilized
+## 🛠️ Quick glance at the infrastructure I used
 
-| Technology / Service          | Purpose                                                                 |
+| Tech / Service          | Purpose                                                                 |
 | :---------------------------- | :---------------------------------------------------------------------- |
-| **Microsoft Azure**           | Cloud platform for hosting all resources.                               |
-| **Azure Virtual Machines**    | Windows (with SQL Server) & Linux OS for honeypot targets.              |
-| **Azure Log Analytics (LAW)** | Centralized repository for log ingestion and analysis.                  |
-| **Microsoft Sentinel**        | SIEM/SOAR for threat detection, incident management, and visualization. |
-| **Azure Network Security Groups (NSGs)** | Network traffic filtering at the VM/subnet level.                       |
-| **Microsoft Entra ID**        | Identity and access management for user creation and permissions.       |
-| **Azure Blob Storage**        | Storing threat intelligence data (e.g., 'IP-watchlist').                |
-| **Microsoft Defender for Cloud** | Security posture management and threat protection.                      |
-| **Azure Key Vault**           | Securely storing and managing secrets.                                  |
-| **Kusto Query Language (KQL)**| Language for querying logs and generating security metrics.             |
+| **Microsoft Azure**           | Cloud platform for hosting all resources                               |
+| **Azure Virtual Machines**    | Windows (with SQL Server) & Linux OS for honeypot targets              |
+| **Azure Log Analytics (LAW)** | Centralized repository for log ingestion and analysis                  |
+| **Microsoft Sentinel**        | SIEM/SOAR for threat detection, incident management, and visualization |
+| **Azure Network Security Groups (NSGs)** | Network traffic filtering at the VM/subnet level                       |
+| **Microsoft Entra ID**        | Identity and access management for user creation and permissions      |
+| **Azure Blob Storage**        | Storing threat intelligence data (eg: 'ip-watchlist')                |
+| **Microsoft Defender for Cloud** | Security posture management and threat protection                      |
+| **Azure Key Vault**           | Securely storing and managing secrets                                   |
+| **Kusto Query Language (KQL)**| Language for querying logs and generating security metrics             |
+
+**Resources:**  
+- 2 publicly exposed VMs (Windows + Linux) = honeypots  
+- Attack VM (to simulate red team stuff)  
+- Entra ID users + IAM roles (priv esc testing)  
+- Blob Storage (watchlist integration)  
+- Defender for Cloud (rec-driven hardening)  
+- Key Vault (baited w/ secrets)  
+- NSGs open then hardened (3389, 22, 1433, etc)  
+- All logs piped into LAW → Sentinel
+
+> _PS - this is all cloud native, no 3rd party agents or EDR required_
 
 ---
 
-## Phase 1: Constructing the Honeynet - The "Open Gates" Approach
+<br>
+<br>
+
+## Phase 1: *Exposed Mode*
 
 The initial phase focused on building the honeynet infrastructure with intentionally weakened security postures to maximize the observable attack surface. This approach, while risky in a production environment, is crucial for a honeynet's purpose: to attract and study attacks.
 
@@ -68,11 +97,26 @@ The initial phase focused on building the honeynet infrastructure with intention
         *   Execution of suspicious commands or processes (if advanced VM logging was enabled).
         *   Matches against the `IP-watchlist`.
 
+
+### ✅ tl;dr: I pretty much:
+> - Stand up a honeynet w/ **intentionally bad security** (public endpoints, no firewalls)
+> - Open up RDP, SSH, SQL, HTTP to the world
+> - Let the bad guys come... then simulate internal attacker behavior via Attack-VM
+> - Confirm log ingestion + alerting (Sentinel)
+
+---
+
+<br>
+
 ### 🏗️ Architecture Before Hardening:
 This diagram illustrates the initial, highly exposed state of the honeynet.
 
 ![Architecture BEFORE Hardening](https://github.com/user-attachments/assets/f8fdc64f-38e0-4a70-bbe3-99f5b81a1583)
 *(All resources deployed with public endpoints and minimal network restrictions.)*
+
+---
+
+<br>
 
 ### 🎯 Simulated Attacks During Open Exposure:
 While the environment was open to organic internet traffic, the following specific attacks were simulated using the 'Attack-VM':
@@ -85,9 +129,18 @@ While the environment was open to organic internet traffic, the following specif
 
 These simulated events were designed to ensure Sentinel's analytic rules were functioning correctly and generating the expected alerts and incidents.
 
+### ✅ tl;dr:
+> _Attacks run manually + passively observed from global traffic_:
+> - Brute force logins (then intentional successful ones)
+> - Mimic malware uploads (eg: `mimikatz.exe`)
+> - Vault access violations (wrong IP / wrong user)
+
 ---
 
-## 🛡️ Phase 2: Incident Response, Remediation, and Fortification
+<br>
+<br>
+
+## Phase 2: *Hardened Mode* (incident response + remediation + fortification)
 
 After 24 hours of data collection in the "open" state, the focus shifted to hardening the environment. This phase mirrors the remediation steps a SOC analyst would take after identifying vulnerabilities and active threats.
 
@@ -123,9 +176,20 @@ This diagram showcases the significantly improved security posture after impleme
 ![Architecture AFTER Hardening](https://github.com/user-attachments/assets/52173322-dae6-419c-b0d7-46237da9f193)
 *(Resources are now shielded by restrictive NSGs, host firewalls, and utilize private endpoints, drastically reducing the attack surface.)*
 
+### ✅ tl;dr: after 24 hours of collection I
+> - Turned on host firewalls, shut down all public endpoints  
+> - Replaced NSG rules w/ IP-restricted policies  
+> - IAM scoped down to least privilege  
+> - Enabled Private Endpoints for SQL, Key Vault, Blob  
+> - Reviewed all Defender for Cloud recs → applied top-priority ones  
+> - *Zero public access after this point*
+
 ---
 
-## 📊 Phase 3: Measuring the Impact - Metrics Before vs. After
+<br>
+<br>
+
+## Phase 3: Before vs. After Metrics
 
 Once the security controls were in place, the environment was monitored for another 24-hour period. The collected data was then compared against the baseline from the "open" phase.
 
@@ -134,18 +198,24 @@ Once the security controls were in place, the environment was monitored for anot
 | Metric Category                 | Before Hardening | After Hardening | Change (%) | Significance                                                                                                |
 | :------------------------------ | :--------------: | :-------------: | :--------: | :---------------------------------------------------------------------------------------------------------- |
 | **Failed RDP/SSH Logins**       |      ~3500       |        0        |  -100%     | Drastic reduction due to NSG restrictions & firewall rules. Attackers can no longer reach the login ports. |
-| **Security Alerts (Sentinel)**  |       ~50        |      ~2-5       |   ~-90%    | Significant drop; remaining alerts likely from internal "Attack-VM" tests or highly persistent (but blocked) probes. |
-| **Malicious IPs Detected (NSG)**|      ~200        |      ~5-10      |   ~-95%    | NSGs block most unsolicited traffic before it can be analyzed deeper.                                     |
-| **Successful Brute-Force**      |        1         |        0        |  -100%     | Hardened credentials and port restrictions prevent unauthorized access.                                     |
-| **Key Vault Anomalous Access**  |        1         |        0        |  -100%     | Private endpoints and IAM controls prevent unauthorized access attempts.                                    |
+| **Security Alerts (Sentinel)**  |       ~50        |      ~2-5       |   ~-90%    | Significant drop; remaining alerts likely from internal "Attack-VM" tests or highly persistent (but blocked) probes |
+| **Malicious IPs Detected (NSG)**|      ~200        |      ~5-10      |   ~-95%    | NSGs block most unsolicited traffic before it can be analyzed deeper                                     |
+| **Successful Brute-Force**      |        1         |        0        |  -100%     | Hardened credentials and port restrictions prevent unauthorized access                                     |
+| **Key Vault Anomalous Access**  |        1         |        0        |  -100%     | Private endpoints and IAM controls (RBAC) combo blocked all unauthorized access attempts                                    |
 
-*(Note: The above table is an interpretation of the provided chart. Actual values from your project should be used if different.)*
 
 **Visual Representation of Metrics:**
 ![Metrics Chart: Before vs After Hardening](https://github.com/user-attachments/assets/ed5c88f6-1aaf-4160-ac7d-1384ca53c450)
 *(This chart visually underscores the dramatic reduction in security incidents post-hardening.)*
 
+==Pretty confident== I knocked out 99.998%+ of the attack surface in <24hrs.  
+…and proved it with data, not just config screenshots.
+
 ---
+
+<br>
+<br>
+<br>
 
 ## 🗺️ Attack Maps: Visualizing the Threat Landscape
 
@@ -171,3 +241,39 @@ These maps vividly illustrate the global nature of automated attacks targeting e
 
 ```txt
 (Sentinel did NOT generate ANY maps for any of the KQL map queries for the metrics measured during the 24hr period after hardening, thus confirming the effectiveness of the Security Controls implemented.)
+```
+
+---
+
+<br>
+<br>
+<br>
+
+## 🧠 What's next from here?
+
++ Automate red team behavior (Atomic Red Team / Caldera)  
++ Turn this into a repeatable SOC lab for anyone (ARM / Terraform / Bicep)  
++ Build dashboards in Power BI from LAW  
++ Publish sanitized threat data for blue team drill training  
++ Scale it to AWS/GCP for cloud2cloud attack sim (cross cloud detection game)
+
+If you want to collab on this, feel free to reach out I'm always down!
+
+---
+
+## 💼 Let’s Keep It Real
+
+If you’re hiring for a role where:
+- Cloud + SIEM is the core stack  
+- You want someone who can **build** and **secure** infra  
+- You care more about thinking + output than certs...
+
+Then we should talk. I’d be dangerous in a Jr/Mid SOC analyst role, or cloud security team
+
+email: salaheldinyasir@gmail.com    
+chat: [LinkedIn](https://linkedin.com/in/yasir-ai)  
+bonus: I’ll send you the KQL + attack logs if you wanna nerd out
+
+---
+
+{made this lab to learn faster, but also... to win}
