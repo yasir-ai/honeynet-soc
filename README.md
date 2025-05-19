@@ -1,4 +1,4 @@
-# 🛡️ Azure SOC & Honeynet Fortification Lab [Part 1] 🛡️
+# Azure SOC & Honeynet Fortification Lab [Part 1]
 
 [![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
 [![Microsoft Sentinel](https://img.shields.io/badge/Microsoft_Sentinel-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/en-us/services/microsoft-sentinel/)
@@ -6,7 +6,7 @@
 [![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Project-blue?style=for-the-badge)](https://en.wikipedia.org/wiki/Computer_security)
 [![NIST](https://img.shields.io/badge/NIST%20Framework-Applied-lightgrey?style=for-the-badge)](https://www.nist.gov/cyberframework)
 
-## 🚀 TL;DR: why this matters
+## 🤔 TL;DR: why this matters
 
 I spent 2 x 24hr sprints in Azure simulating how a real SOC team would:
 1) Attract threat actors (honeynet)
