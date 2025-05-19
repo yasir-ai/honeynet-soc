@@ -1,4 +1,4 @@
-# 🛡️ Azure SOC & Honeynet Fortification Project 🛡️
+# 🛡️ Azure SOC & Honeynet Fortification Project, Part 1 🛡️
 
 [![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
 [![Microsoft Sentinel](https://img.shields.io/badge/Microsoft_Sentinel-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/en-us/services/microsoft-sentinel/)
@@ -6,7 +6,7 @@
 [![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Project-blue?style=for-the-badge)](https://en.wikipedia.org/wiki/Computer_security)
 [![NIST](https://img.shields.io/badge/NIST%20Framework-Applied-lightgrey?style=for-the-badge)](https://www.nist.gov/cyberframework)
 
-## 🚀 Introduction: Simulating Reality, Building Resilience
+## 🚀 Introduction
 
 This project documents the creation and hardening of a scalable **honeynet** within the Microsoft Azure cloud ecosystem. The primary objective was to establish a controlled, observable environment to attract and analyze malicious activity, then implement robust security controls and measure their effectiveness.
 
