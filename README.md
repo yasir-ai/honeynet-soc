@@ -1,4 +1,4 @@
-# 🛡️ Azure SOC & Honeynet Fortification Project, Part 1 🛡️
+# 🛡️ Azure SOC & Honeynet Fortification Project [Part 1] 🛡️
 
 [![Azure](https://img.shields.io/badge/Azure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com)
 [![Microsoft Sentinel](https://img.shields.io/badge/Microsoft_Sentinel-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)](https://azure.microsoft.com/en-us/services/microsoft-sentinel/)
